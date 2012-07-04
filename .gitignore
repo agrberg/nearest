@@ -1,3 +1,6 @@
+# Gems
+*.gem
+
 # RVM
 .rvmrc
 
