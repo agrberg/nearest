@@ -2,9 +2,18 @@ Overview
 --------
 
 nearest adds the nearset method to the Ruby Time class. This allows you to get the nearest X minutes from a given time. The argument to the nearest method is in seconds to keep the Ruby code more readable.
-e.g. time.nearest(15.minutes)
+
+e.g.
+``` ruby
+time.nearest(15.minutes)
+```
 
 This is useful if you break up hours into regular intervals such as every 15 minutes. It also can optionally forcing the time period to be in the future or past instead of the closest (either future or past) from the given time.
+
+Important
+---------
+
+Please keep in mind that this is just for minute durations that cleanly divide an hour. Putting in other times than those can cause wonky behavior due to the way nearest time is calculated and is not intended to be covered by this gem.
 
 Setup & Installation
 --------------------
