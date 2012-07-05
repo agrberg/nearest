@@ -17,5 +17,10 @@ describe Time do
     it 'should be able to force the nearest time to be in the past' do
       Time.parse('1:10pm').nearest(15 * 60, :force => :past).should == Time.parse('1:00pm')
     end
+
+    it 'should return the time in UTC if it was utc' do
+      Time.parse('1:10pm').nearest(15 * 60).zone.should == Time.now.zone
+      Time.parse('1:10pm').utc.nearest(15 * 60).zone.should == Time.now.utc.zone
+    end
   end
 end
