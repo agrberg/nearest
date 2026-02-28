@@ -3,7 +3,7 @@
 require_relative 'core'
 
 class Time # rubocop:disable Style/Documentation
-  def nearest(seconds, round: :nearest)
-    Nearest.new(self).nearest(seconds, round:)
+  def nearest(seconds, round: :nearest, anchor: nil)
+    Nearest.new(self).nearest(seconds, round:, anchor:)
   end
 end

@@ -10,3 +10,17 @@ require 'time'
 require 'active_support/isolated_execution_state' # Needed by Time.zone= for thread-safe per-fiber state.
 require 'active_support/time' # Adds Numeric#minutes, Time.zone=, and TimeWithZone for named time zone support.
 require_relative '../lib/nearest'
+
+module SuppressWarnings
+  def suppress_warnings
+    original = $VERBOSE
+    $VERBOSE = nil
+    yield
+  ensure
+    $VERBOSE = original
+  end
+end
+
+RSpec.configure do |config|
+  config.include SuppressWarnings
+end

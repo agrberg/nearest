@@ -95,9 +95,43 @@ Nearest.new(Time.zone.parse('2026-11-01 01:53:00')).nearest(15 * 60).zone
 # => "EST"
 ```
 
-## Important
+### Anchoring
 
-This is intended for minute durations that cleanly divide an hour (e.g., 5, 10, 15, 20, 30). Other intervals may produce unexpected results.
+By default, rounding boundaries are relative to the Unix epoch. This works well for intervals that evenly divide 3600 (5, 10, 15, 20, 30, 60), but produces unintuitive results for other intervals (7, 8, 45, 90). A warning is emitted when an interval doesn't evenly divide 3600.
+
+Use the `anchor:` keyword to choose a different reference point:
+
+```ruby
+# anchor: :hour — boundaries restart at the top of each hour
+Nearest.new(Time.parse('1:10pm')).nearest(7 * 60, anchor: :hour).strftime('%-l:%M%P')
+# => "1:07pm"  (grid: :00, :07, :14, :21, :28, :35, :42, :49, :56)
+
+# anchor: :day — boundaries restart at local midnight
+Nearest.new(Time.parse('1:10pm')).nearest(45 * 60, anchor: :day).strftime('%-l:%M%P')
+# => "1:30pm"  (grid: 12:00am, 12:45am, 1:30am, 2:15am, 3:00am, ...)
+
+# anchor: :epoch — explicit epoch-based rounding (no warning)
+Nearest.new(Time.parse('1:10pm')).nearest(7 * 60, anchor: :epoch).strftime('%-l:%M%P')
+```
+
+The `anchor:` option works with all rounding modes and monkey patches:
+
+```ruby
+Time.parse('1:10pm').nearest(7 * 60, round: :down, anchor: :hour).strftime('%-l:%M%P')
+# => "1:07pm"
+
+# round: :prev crosses backward past the anchor point
+Time.parse('1:00pm').nearest(7 * 60, round: :prev, anchor: :hour).strftime('%-l:%M%P')
+# => "12:53pm"
+
+# round: :next crosses forward past the end of the anchor period
+Time.parse('1:56pm').nearest(7 * 60, round: :next, anchor: :hour).strftime('%-l:%M%P')
+# => "2:03pm"
+
+# Same with anchor: :day
+Time.parse('12:00am').nearest(7 * 60, round: :prev, anchor: :day).strftime('%-l:%M%P')
+# => "11:53pm"  (previous day)
+```
 
 ## Installation
 

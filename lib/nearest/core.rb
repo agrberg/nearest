@@ -22,19 +22,41 @@
 #   round: :down    => quotient     => 1:00pm
 #   round: :prev    => quotient     => 1:00pm  (always retreats, even from a boundary)
 class Nearest
+  @warned_intervals = Set.new
+
+  class << self
+    def warn_once(seconds)
+      int = seconds.to_i
+      return if (3600 % int).zero?
+      return unless @warned_intervals.add?(int)
+
+      Kernel.warn "nearest: #{int}s does not evenly divide 3600; " \
+                  'boundaries may not align with clock minutes. ' \
+                  'Use anchor: :hour or anchor: :day for clock-aligned rounding'
+    end
+
+    def reset_warnings!
+      @warned_intervals.clear
+    end
+  end
+
   def initialize(time)
     @time = time
   end
 
-  def nearest(seconds, round: :nearest)
-    validate!(seconds, round)
-    rebuild(rounded_epoch(seconds, round))
+  def nearest(seconds, round: :nearest, anchor: nil)
+    anchor_defaulted = anchor.nil?
+    anchor ||= :epoch
+    validate!(seconds, round, anchor)
+    self.class.warn_once(seconds) if anchor_defaulted
+    rebuild(rounded_epoch(seconds, round, anchor))
   end
 
   private
 
-  def rounded_epoch(seconds, round) # rubocop:disable Metrics/CyclomaticComplexity
-    quotient, remainder = @time.to_i.divmod(seconds)
+  def rounded_epoch(seconds, round, anchor) # rubocop:disable Metrics/CyclomaticComplexity
+    base, offset = base_and_offset(anchor)
+    quotient, remainder = offset.divmod(seconds)
     rounded = case round
               when :next    then quotient + 1                                       # always advance
               when :up      then remainder.zero? ? quotient : quotient + 1          # advance, unless exact
@@ -42,7 +64,20 @@ class Nearest
               when :down    then quotient                                           # truncate
               when :prev    then remainder.zero? ? quotient - 1 : quotient          # always retreat
               end
-    rounded * seconds
+    base + (rounded * seconds)
+  end
+
+  def base_and_offset(anchor)
+    case anchor
+    when :epoch
+      [0, @time.to_i]
+    when :hour
+      local_offset = (@time.min * 60) + @time.sec
+      [@time.to_i - local_offset, local_offset]
+    when :day
+      local_offset = (@time.hour * 3600) + (@time.min * 60) + @time.sec
+      [@time.to_i - local_offset, local_offset]
+    end
   end
 
   def rebuild(epoch)
@@ -56,10 +91,15 @@ class Nearest
     end
   end
 
-  def validate!(seconds, round)
+  def validate!(seconds, round, anchor)
     raise ArgumentError, 'seconds must be a positive number' unless seconds.is_a?(Numeric) && seconds.positive?
-    return if %i[next up nearest down prev].include?(round)
 
-    raise ArgumentError, "round must be :next, :up, :nearest, :down, or :prev (got #{round.inspect})"
+    unless %i[next up nearest down prev].include?(round)
+      raise ArgumentError, "round must be :next, :up, :nearest, :down, or :prev (got #{round.inspect})"
+    end
+
+    return if %i[epoch hour day].include?(anchor)
+
+    raise ArgumentError, "anchor must be :epoch, :hour, or :day (got #{anchor.inspect})"
   end
 end
