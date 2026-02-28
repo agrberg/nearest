@@ -25,7 +25,7 @@ class Time
   def nearest(seconds, round: :nearest)
     validate_nearest_args!(seconds, round)
 
-    new_time = Time.at(nearest_epoch(seconds, round))
+    new_time = Time.at(nearest_epoch(seconds, round), in: utc_offset)
     utc? ? new_time.utc : new_time
   end
 

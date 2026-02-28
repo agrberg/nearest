@@ -12,14 +12,21 @@ describe Time do
       expect(time_for('1:10pm').nearest(15 * 60)).to be_a(described_class)
     end
 
-    it 'preserves local timezone' do
-      local_time = time_for('1:10pm')
-      expect(local_time.nearest(15 * 60).zone).to eq local_time.zone
-    end
+    describe 'preserving the time zone' do
+      it 'preserves the local time zone' do
+        local_time = time_for('1:10pm')
+        expect(local_time.nearest(15 * 60).utc_offset).to eq local_time.utc_offset
+      end
 
-    it 'preserves UTC timezone' do
-      utc_time = time_for('1:10pm').utc
-      expect(utc_time.nearest(15 * 60).zone).to eq 'UTC'
+      it 'preserves the UTC time zone' do
+        utc_time = time_for('1:10pm').utc
+        expect(utc_time.nearest(15 * 60).zone).to eq 'UTC'
+      end
+
+      it 'preserves a fixed-offset time zone' do
+        fixed_time = time_for('1:10pm').getlocal('+05:30')
+        expect(fixed_time.nearest(15 * 60).utc_offset).to eq fixed_time.utc_offset
+      end
     end
 
     describe 'validating the arguments' do
