@@ -20,6 +20,14 @@ describe Time do
       expect(described_class.parse('1:00pm').nearest(15 * 60)).to eq described_class.parse('1:00pm')
     end
 
+    it 'advances to the next interval' do
+      expect(described_class.parse('1:06pm').nearest(15 * 60, round: :next)).to eq described_class.parse('1:15pm')
+    end
+
+    it 'advances past an exact boundary' do
+      expect(described_class.parse('1:00pm').nearest(15 * 60, round: :next)).to eq described_class.parse('1:15pm')
+    end
+
     it 'rounds up to the next interval' do
       expect(described_class.parse('1:06pm').nearest(15 * 60, round: :up)).to eq described_class.parse('1:15pm')
     end
@@ -34,6 +42,14 @@ describe Time do
 
     it 'returns the same time when rounding down on an exact boundary' do
       expect(described_class.parse('1:00pm').nearest(15 * 60, round: :down)).to eq described_class.parse('1:00pm')
+    end
+
+    it 'retreats to the previous interval' do
+      expect(described_class.parse('1:10pm').nearest(15 * 60, round: :prev)).to eq described_class.parse('1:00pm')
+    end
+
+    it 'retreats past an exact boundary' do
+      expect(described_class.parse('1:00pm').nearest(15 * 60, round: :prev)).to eq described_class.parse('12:45pm')
     end
 
     it 'preserves local timezone' do

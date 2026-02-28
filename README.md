@@ -15,11 +15,16 @@ Time.parse('1:10pm').nearest(15 * 60)
 By default, `nearest` rounds to the closest interval. You can control the direction with the `round` keyword:
 
 ```ruby
-Time.parse('1:06pm').nearest(15 * 60, round: :up)
-# => 1:15pm
+Time.parse('1:06pm').nearest(15 * 60, round: :up)    # => 1:15pm
+Time.parse('1:10pm').nearest(15 * 60, round: :down)  # => 1:00pm
+```
 
-Time.parse('1:10pm').nearest(15 * 60, round: :down)
-# => 1:00pm
+`:up` and `:down` stay put when already on a boundary. Use `:next` and `:prev` to always move:
+
+```ruby
+Time.parse('1:00pm').nearest(15 * 60, round: :up)    # => 1:00pm (already on boundary)
+Time.parse('1:00pm').nearest(15 * 60, round: :next)  # => 1:15pm (always advances)
+Time.parse('1:00pm').nearest(15 * 60, round: :prev)  # => 12:45pm (always retreats)
 ```
 
 ### Timezone Preservation
