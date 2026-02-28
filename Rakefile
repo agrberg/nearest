@@ -1,16 +1,21 @@
+# frozen_string_literal: true
+
 require 'rake'
 require 'rspec/core/rake_task'
+require 'rubocop/rake_task'
 
-desc 'Default: run specs.'
-task :default => :spec
+desc 'Default: run specs and rubocop'
+task default: %i[spec rubocop]
 
 desc 'Run specs'
 RSpec::Core::RakeTask.new do |t|
-  t.pattern = "./spec/**/*_spec.rb"
+  t.pattern = './spec/**/*_spec.rb'
 end
 
-desc 'Generage code coverage with simplecov'
+RuboCop::RakeTask.new
+
+desc 'Generate code coverage with simplecov'
 task :coverage do
-  `rake spec COVERAGE=true`
+  `COVERAGE=true rspec`
   `open coverage/index.html`
 end

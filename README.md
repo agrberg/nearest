@@ -1,36 +1,48 @@
-Overview
---------
+# `Time#nearest`
 
-nearest adds the nearset method to the Ruby Time class. This allows you to get the nearest X minutes from a given time. The argument to the nearest method is in seconds to keep the Ruby code more readable.
+[![CI](https://github.com/agrberg/nearest/actions/workflows/ci.yml/badge.svg)](https://github.com/agrberg/nearest/actions/workflows/ci.yml)
+[![Gem Version](https://badge.fury.io/rb/nearest.svg)](https://badge.fury.io/rb/nearest)
 
-e.g.
-``` ruby
-time.nearest(15.minutes)
+`nearest` extends Ruby's `Time` class with a `nearest` method, allowing you to round a time to the nearest interval of minutes.
+
+```ruby
+Time.parse('1:10pm').nearest(15 * 60)
+# => 1:15pm
 ```
 
-This is useful if you break up hours into regular intervals such as every 15 minutes. It also can optionally forcing the time period to be in the future or past instead of the closest (either future or past) from the given time.
+### Rounding Direction
 
-Important
----------
+By default, `nearest` rounds to the closest interval. You can force the direction with the `force` keyword:
 
-Please keep in mind that this is just for minute durations that cleanly divide an hour. Putting in other times than those can cause wonky behavior due to the way nearest time is calculated and is not intended to be covered by this gem.
+```ruby
+Time.parse('1:06pm').nearest(15 * 60, force: :future)
+# => 1:15pm
 
-Setup & Installation
---------------------
+Time.parse('1:10pm').nearest(15 * 60, force: :past)
+# => 1:00pm
+```
 
-Install with `[sudo] gem install nearest`
+### Timezone Preservation
+
+The returned time preserves the timezone of the input:
+
+```ruby
+Time.parse('1:10pm').utc.nearest(15 * 60).zone
+# => "UTC"
+```
+
+## Important
+
+This is intended for minute durations that cleanly divide an hour (e.g., 5, 10, 15, 20, 30). Other intervals may produce unexpected results.
+
+## Installation
 
 Include it in your project's `Gemfile`:
 
-``` ruby
+```ruby
 gem 'nearest'
 ```
 
-License
----------
+## License
 
-This is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License Version 2 as published by the Free Software Foundation: www.gnu.org/copyleft/gpl.html
-
-This is just a tiny gem for some very specific functionality I found myself needing in not only other apps but other gems as well.
-
-As with all my work, please feel free to use it for whatever you like except in the assistance of robots or chimpanzees taking over the world. Nothing will ever get me to trust a chimpanzee.
+MIT: https://mit-license.org/

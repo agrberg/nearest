@@ -1,12 +1,9 @@
-require 'simplecov'
-SimpleCov.start if ENV['COVERAGE']
+# frozen_string_literal: true
 
-SPEC_DIR = File.dirname(__FILE__)
-lib_path = File.expand_path("#{SPEC_DIR}/../lib")
-$LOAD_PATH.unshift lib_path unless $LOAD_PATH.include?(lib_path)
-
-require 'nearest'
-
-RSpec.configure do |config|
-  # some (optional) config here
+if ENV['COVERAGE']
+  require 'simplecov'
+  SimpleCov.start
 end
+
+require 'time'
+require_relative '../lib/nearest'
