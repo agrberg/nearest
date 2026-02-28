@@ -20,12 +20,20 @@ describe Time do
       expect(described_class.parse('1:00pm').nearest(15 * 60)).to eq described_class.parse('1:00pm')
     end
 
-    it 'forces the nearest time to be in the future' do
-      expect(described_class.parse('1:06pm').nearest(15 * 60, force: :future)).to eq described_class.parse('1:15pm')
+    it 'rounds up to the next interval' do
+      expect(described_class.parse('1:06pm').nearest(15 * 60, round: :up)).to eq described_class.parse('1:15pm')
     end
 
-    it 'forces the nearest time to be in the past' do
-      expect(described_class.parse('1:10pm').nearest(15 * 60, force: :past)).to eq described_class.parse('1:00pm')
+    it 'returns the same time when rounding up on an exact boundary' do
+      expect(described_class.parse('1:00pm').nearest(15 * 60, round: :up)).to eq described_class.parse('1:00pm')
+    end
+
+    it 'rounds down to the previous interval' do
+      expect(described_class.parse('1:10pm').nearest(15 * 60, round: :down)).to eq described_class.parse('1:00pm')
+    end
+
+    it 'returns the same time when rounding down on an exact boundary' do
+      expect(described_class.parse('1:00pm').nearest(15 * 60, round: :down)).to eq described_class.parse('1:00pm')
     end
 
     it 'preserves local timezone' do
@@ -44,6 +52,19 @@ describe Time do
 
     it 'works with 30-minute intervals' do
       expect(described_class.parse('1:23pm').nearest(30 * 60)).to eq described_class.parse('1:30pm')
+    end
+
+    it 'raises ArgumentError for zero seconds' do
+      expect { described_class.parse('1:10pm').nearest(0) }.to raise_error(ArgumentError, /positive/)
+    end
+
+    it 'raises ArgumentError for negative seconds' do
+      expect { described_class.parse('1:10pm').nearest(-60) }.to raise_error(ArgumentError, /positive/)
+    end
+
+    it 'raises ArgumentError for invalid round value' do
+      expect { described_class.parse('1:10pm').nearest(15 * 60, round: :invalid) }
+        .to raise_error(ArgumentError, /round/)
     end
   end
 end

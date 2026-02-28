@@ -12,13 +12,13 @@ Time.parse('1:10pm').nearest(15 * 60)
 
 ### Rounding Direction
 
-By default, `nearest` rounds to the closest interval. You can force the direction with the `force` keyword:
+By default, `nearest` rounds to the closest interval. You can control the direction with the `round` keyword:
 
 ```ruby
-Time.parse('1:06pm').nearest(15 * 60, force: :future)
+Time.parse('1:06pm').nearest(15 * 60, round: :up)
 # => 1:15pm
 
-Time.parse('1:10pm').nearest(15 * 60, force: :past)
+Time.parse('1:10pm').nearest(15 * 60, round: :down)
 # => 1:00pm
 ```
 
