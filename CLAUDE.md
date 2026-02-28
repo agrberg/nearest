@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-`nearest` is a Ruby gem that adds a `nearest` method to `Time`, allowing you to round a time to the nearest interval (e.g., nearest 15 minutes). Supports rounding to closest, forcing future, or forcing past.
+`nearest` is a Ruby gem that rounds `Time`, `DateTime`, or `ActiveSupport::TimeWithZone` to the nearest interval (e.g., nearest 15 minutes). Provides a standalone `Nearest` class and opt-in monkey patches. Supports five rounding modes (`:next`, `:up`, `:nearest` (default), `:down`, `:prev`) and an `anchor:` option (`:epoch`, `:hour`, `:day`) for clock-aligned rounding.
 
 ## Commands
 
@@ -19,7 +19,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture
 
-The entire gem is a single file (`lib/nearest.rb`) that monkey-patches `Time#nearest`. It divides the time by the interval in seconds, rounds/ceils/floors, then multiplies back. Tests are in `spec/nearest_spec.rb` using RSpec.
+The gem is organized under `lib/nearest/`:
+
+- `lib/nearest.rb` — Entry point; requires core and monkey patch files
+- `lib/nearest/core.rb` — Standalone `Nearest` class: converts time to epoch seconds, uses `divmod` to find interval boundaries, then picks the correct boundary based on the rounding mode
+- `lib/nearest/time.rb` — Monkey patch adding `Time#nearest`
+- `lib/nearest/date_time.rb` — Monkey patch adding `DateTime#nearest`
+- `lib/nearest/time_with_zone.rb` — Monkey patch adding `ActiveSupport::TimeWithZone#nearest` (conditionally loaded)
+
+Tests are in `spec/nearest/` with separate spec files for core, time, date_time, and time_with_zone. Uses RSpec.
 
 ## Linting
 
