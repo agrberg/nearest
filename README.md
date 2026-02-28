@@ -8,6 +8,10 @@
 ```ruby
 Time.parse('1:10pm').nearest(15 * 60)
 # => 1:15pm
+
+# Also works with ActiveSupport::Duration
+Time.parse('1:10pm').nearest(15.minutes)
+# => 1:15pm
 ```
 
 ### Rounding Direction

@@ -3,6 +3,7 @@
 source 'https://rubygems.org'
 
 group :development, :test do
+  gem 'activesupport'
   gem 'rake'
   gem 'rspec'
   gem 'rubocop'

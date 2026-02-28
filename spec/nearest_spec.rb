@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# Adds methods like `minutes` to Numeric, producing an ActiveSupport::Duration.
+require 'active_support/core_ext/numeric/time'
+
 # rubocop:disable RSpec/SpecFilePathFormat
 describe Time do
   # rubocop:enable RSpec/SpecFilePathFormat
@@ -10,6 +13,10 @@ describe Time do
 
     it 'returns a Time object' do
       expect(time_for('1:10pm').nearest(15 * 60)).to be_a(described_class)
+    end
+
+    it 'accepts an ActiveSupport::Duration' do
+      expect(time_for('1:10pm').nearest(15.minutes)).to eq time_for('1:15pm')
     end
 
     describe 'preserving the time zone' do
