@@ -24,3 +24,11 @@ The entire gem is a single file (`lib/nearest.rb`) that monkey-patches `Time#nea
 ## Linting
 
 RuboCop is configured (`.rubocop.yml`) with plugins: `rubocop-performance`, `rubocop-rake`, `rubocop-rspec`. All new cops are enabled by default.
+
+## CI
+
+GitHub Actions CI (`.github/workflows/ci.yml`) runs on pushes to `main` and all pull requests. It lints with RuboCop and runs RSpec across Ruby 3.3, 3.4, and 4.0.
+
+## Branching
+
+The default branch is `main`.
